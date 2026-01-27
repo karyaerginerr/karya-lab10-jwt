@@ -25,4 +25,22 @@ public class RefreshTokenService {
 
         return refreshTokenRepository.save(refreshToken);
     }
+
+    public RefreshToken rotateRefreshToken(String oldToken) {
+        RefreshToken existingToken = refreshTokenRepository.findByToken(oldToken)
+                .orElseThrow(() -> new RuntimeException("Refresh token not found"));
+
+        if (existingToken.isRevoked()) {
+            throw new RuntimeException("Refresh token already revoked");
+        }
+
+        if (existingToken.getExpiryDate().isBefore(Instant.now())) {
+            throw new RuntimeException("Refresh token expired");
+        }
+
+        existingToken.setRevoked(true);
+        refreshTokenRepository.save(existingToken);
+
+        return createRefreshToken(existingToken.getUserId());
+    }
 }
