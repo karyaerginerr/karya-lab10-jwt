@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login & Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+        }
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .tab.active {
+            color: #2196F3;
+            border-bottom: 2px solid #2196F3;
+        }
+        .form-container {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .form-container.active {
+            display: block;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            color: white;
+            background-color: #4CAF50;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .success { background-color: #d4edda; color: #155724; padding: 10px; margin-top: 15px; border-radius: 4px; }
+        .error { background-color: #f8d7da; color: #721c24; padding: 10px; margin-top: 15px; border-radius: 4px; }
+        .token-box {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            word-break: break-all;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="tabs">
+    <div class="tab active" onclick="showTab('login')">Login</div>
+    <div class="tab" onclick="showTab('register')">Register</div>
+</div>
+
+<div id="loginForm" class="form-container active">
+    <label>Email</label>
+    <input type="email" id="loginEmail" placeholder="Email" />
+    <label>Password</label>
+    <input type="password" id="loginPassword" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <div id="loginResult"></div>
+    <div id="tokenDisplay"></div>
+</div>
+
+<div id="registerForm" class="form-container">
+    <label>Username</label>
+    <input type="text" id="regUsername" placeholder="Username" />
+    <label>Email</label>
+    <input type="email" id="regEmail" placeholder="Email" />
+    <label>Password</label>
+    <input type="password" id="regPassword" placeholder="Password" />
+    <button onclick="register()">Register</button>
+    <div id="registerResult"></div>
+</div>
+
+<script>
+    function showTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.form-container').forEach(f => f.classList.remove('active'));
+
+      if (tab === 'login') {
+          document.querySelectorAll('.tab')[0].classList.add('active');
+          document.getElementById('loginForm').classList.add('active');
+      } else {
+          document.querySelectorAll('.tab')[1].classList.add('active');
+          document.getElementById('registerForm').classList.add('active');
+      }
+  }
+
+  async function register() {
+      const username = document.getElementById("regUsername").value;
+      const email = document.getElementById("regEmail").value;
+      const password = document.getElementById("regPassword").value;
+      const resultDiv = document.getElementById("registerResult");
+
+      const response = await fetch("/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email, password })
+      });
+
+      if (response.ok) {
+          const data = await response.json();
+          resultDiv.className = "success";
+          resultDiv.innerHTML = "✅ " + data.message;
+      } else {
+          resultDiv.className = "error";
+          resultDiv.innerHTML = "❌ Registration Failed!";
+      }
+  }
+
+  async function login() {
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+      const resultDiv = document.getElementById("loginResult");
+      const tokenDiv = document.getElementById("tokenDisplay");
+
+      const response = await fetch("/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+      });
+
+      if (response.ok) {
+          const data = await response.json();
+          resultDiv.className = "success";
+          resultDiv.innerHTML = "✅ " + data.message;
+          tokenDiv.innerHTML = '<div class="token-box"><strong>JWT Token:</strong><br><br>' + data.token + '</div>';
+      } else {
+          resultDiv.className = "error";
+          resultDiv.innerHTML = "❌ Login Failed!";
+          tokenDiv.innerHTML = "";
+      }
+  }
+</script>
+
+</body>
+</html>

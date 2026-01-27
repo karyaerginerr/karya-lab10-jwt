@@ -1,0 +1,37 @@
+# Lab 10 – HTTP Implementation with Java Spring Boot
+
+
+## Technologies Used
+
+- Java 17
+- Spring Boot
+- Spring Web
+- Spring Data JPA
+- SQLite
+- Flyway
+- Maven
+
+
+##  Features Implemented
+
+- HTTP GET request
+- HTTP POST request
+- JSON request body handling
+- JSON response from server
+- HTTP status codes (200 OK, 400 Bad Request)
+- SQLite database connection
+- Flyway database migration
+
+
+##  Project Structure
+
+src/main/java/com/example/karya_lab10
+├── KaryaLab10Application.java
+├── controller
+│ └── HelloController.java
+├── model
+│ ├── Message.java
+│ ├── ResponseMessage.java
+│ └── User.java
+└── repository
+└── UserRepository.java
