@@ -12,7 +12,6 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    // 🔐 256+ bit güvenli key
     private static final SecretKey SECRET_KEY =
             Keys.hmacShaKeyFor(
                     "my-super-secret-key-my-super-secret-key".getBytes()
