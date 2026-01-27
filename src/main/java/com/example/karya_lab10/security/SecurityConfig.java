@@ -27,6 +27,26 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.deny()) // X-Frame-Options: DENY
+                        .contentTypeOptions(cto -> {})        // X-Content-Type-Options: nosniff
+                        .referrerPolicy(referrer ->
+                                referrer.policy(
+                                        org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER
+                                )
+                        )
+                        .contentSecurityPolicy(csp ->
+                                csp.policyDirectives(
+                                        "default-src 'self'; " +
+                                                "script-src 'self'; " +
+                                                "style-src 'self'; " +
+                                                "img-src 'self' data:; " +
+                                                "object-src 'none'; " +
+                                                "frame-ancestors 'none';"
+                                )
+                        )
+                )
+
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers(
@@ -38,15 +58,14 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 HttpMethod.POST,
-                                "/auth/login"
+                                "/auth/login",
+                                "/auth/register",
+                                "/auth/refresh"
                         ).permitAll()
-
-                        .requestMatchers("/auth/**").permitAll()
 
                         .anyRequest().authenticated()
                 )
 
-                // JWT filter
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
